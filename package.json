@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/jasonczx27/Comments/issues"
   },
-  "homepage": "https://github.com/jasonczx27/Comments#readme"
+  "homepage": "https://github.com/jasonczx27/Comments#readme",
+  "dependencies": {
+    "moments": "0.0.2"
+  }
 }
