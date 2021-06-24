@@ -1,0 +1,19 @@
+{
+  "name": "comment",
+  "version": "1.0.0",
+  "description": "a simple program",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonczx27/Comments.git"
+  },
+  "author": "Jasonczx27",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonczx27/Comments/issues"
+  },
+  "homepage": "https://github.com/jasonczx27/Comments#readme"
+}
