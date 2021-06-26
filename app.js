@@ -32,12 +32,9 @@ app.get("/posts", async function (req, res) {
     console.time("     getbestposts")
     try {
 
-        // console.log(req.get("host"))
-        // console.log("starting")
-        const ipaddr = req.headers['cf-connecting-ip'] ?? req.headers['x-forwarded-for'] ?? req.socket.remoteAddress;
-        console.log("captured request from ", ipaddr)
-        // console.log(ipaddr)
-        // console.log("ip retrieved")
+        const ipaddr = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        console.log(`captured request from ${ipaddr} using ${req.get("User-Agent")}`)
+
         if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
 
             requestVM.requestDisauthorized("un-autorized access detected")
@@ -77,18 +74,10 @@ app.get("/comments", async function (req, res) {
     console.time("     getcomments")
     try {
 
-        // console.log(req.get("host"))
-        // console.log("starting")
+
         const ipaddr = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         console.log(`captured request from ${ipaddr} using ${req.get("User-Agent")}`)
-        // console.log(ipaddr)
-        // console.log("ip retrieved")
-        // if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
-        //     console.log(req.get("User-Agent"))
-        //     // requestVM.requestDisauthorized("un-autorized access detected")
-        //     // res.status(requestVM.statuscode).json(requestVM)
-        //     // return
-        // }
+
         const request = await api.FilterComments(req.query);
         if (request && request.issuccess) {
             requestVM.requestSuccess(request.data);
