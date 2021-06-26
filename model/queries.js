@@ -27,10 +27,11 @@ async function GetPosts(id) {
                             }
                             requestVM.requestSuccess(resdata)
                             resolve(requestVM)
+                            return;
                         }
                     })
                 }).on("error", err => {
-                    reject(requestVM.requestFailed(err.statuscode ?? 402, err))
+                    reject(requestVM.requestFailed(err.statuscode ?? 500, err))
                 })
             }
         )
@@ -62,10 +63,12 @@ async function GetComments() {
                         // console.log(JSON.parse(arr))
                         requestVM.requestSuccess(resdata)
                         resolve(requestVM)
+                        return;
 
                     })
                 }).on("error", err => {
                     reject(requestVM.requestFailed(err.statuscode ?? 402, err))
+                    return;
                 })
             }
         )

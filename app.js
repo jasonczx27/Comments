@@ -19,10 +19,17 @@ app.use(bodyParser.json())
 const api = require("./controller/api")
 
 app.get("/posts", async function (req, res) {
+    //#region COMMMENT
+    /**
+     * sample request::
+     * {localhost:PORT} OR {ip:PORT}/posts
+     * {localhost:PORT} OR {ip:PORT}/posts?postid={postid}
+     */
+    //#endregion COMMENT
     const { postid = null } = req.query;
     //testing
     var requestVM = new reqVM()
-    console.time("getbestposts")
+    console.time("     getbestposts")
     try {
 
         // console.log(req.get("host"))
@@ -55,12 +62,56 @@ app.get("/posts", async function (req, res) {
 
     }
 
-    console.timeEnd("getbestposts")
+    console.timeEnd("     getbestposts")
 
 
 })
 
+app.get("/comments", async function (req, res) {
+    //#region  COMMENT
+    /**
+     * 
+     */
+    //#endregion COMMENT
+    var requestVM = new reqVM()
+    console.time("     getcomments")
+    try {
 
+        // console.log(req.get("host"))
+        // console.log("starting")
+        const ipaddr = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        console.log(`captured request from ${ipaddr} using ${req.get("User-Agent")}`)
+        // console.log(ipaddr)
+        // console.log("ip retrieved")
+        // if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
+        //     console.log(req.get("User-Agent"))
+        //     // requestVM.requestDisauthorized("un-autorized access detected")
+        //     // res.status(requestVM.statuscode).json(requestVM)
+        //     // return
+        // }
+        const request = await api.FilterComments(req.query);
+        if (request && request.issuccess) {
+            requestVM.requestSuccess(request.data);
+            res.status(requestVM.statuscode).json(requestVM)
+        }
+        else {
+            requestVM.requestFailed(request.statuscode ?? 500, request.message ?? "the request wasn't successful");
+            res.status(requestVM.statuscode).json(requestVM)
+        }
+
+
+    }
+    catch (e) {
+        console.log("app handled, ", e.message ?? e)
+        requestVM.requestFailed(e.statuscode ?? 500, e.message ?? e);
+        res.status(requestVM.statuscode).json(requestVM)
+
+    }
+
+    console.timeEnd("     getcomments")
+
+
+})
 
 
 
