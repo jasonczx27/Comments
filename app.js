@@ -1,104 +1,68 @@
-const express = require('express');
+const app = require('express')();
 // var http = require('http').Server(express);
+const port = process.env.PORT || 8000;
+
+const reqVM = require("./model/general/viewmodel")
+
 const cors = require('cors');
-const app = express();
-const port = process.env.PORT || 8945;
+
+const server = require('http').createServer(app);
+server.listen(port, () => {
+    console.log("listening at PPPPORRT", port)
+})
+app.use(cors())
+
+const bodyParser = require("body-parser")
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+const api = require("./controller/api")
+
+app.get("/posts", async function (req, res) {
+    const { postid = null } = req.query;
+    //testing
+    var requestVM = new reqVM()
+    console.time("getbestposts")
+    try {
+
+        // console.log(req.get("host"))
+        // console.log("starting")
+        const ipaddr = req.headers['cf-connecting-ip'] ?? req.headers['x-forwarded-for'] ?? req.socket.remoteAddress;
+        console.log("captured request from ", ipaddr)
+        // console.log(ipaddr)
+        // console.log("ip retrieved")
+        if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
+
+            requestVM.requestDisauthorized("un-autorized access detected")
+            res.status(requestVM.statuscode).json(requestVM)
+        }
+        const request = await api.BestPosts(postid);
+        if (request && request.issuccess) {
+            requestVM.requestSuccess(request.data);
+            res.status(requestVM.statuscode).json(requestVM)
+        }
+        else {
+            requestVM.requestFailed(request.statuscode ?? 500, request.message ?? "the request wasn't successful");
+            res.status(requestVM.statuscode).json(requestVM)
+        }
 
 
-//========= USED FOR WEBSOCKET API =========
-app.get('/ws', function (req, res) {
-    let action = req.query.action;
-    let Message = {
-        sockid: "Server",
-        room: "Global",
-        now: new Date()
     }
-    if (action == "chatting") {
-        Message.msg = "HI, I'M CHATTING"
-        sendmessage(Message);
+    catch (e) {
+        console.log("app handled, ", e.message ?? e)
+        requestVM.requestFailed(e.statuscode ?? 500, e.message ?? e);
+        res.status(requestVM.statuscode).json(requestVM)
+
     }
-    else if (action == "loading") {
-        Message.msg = "HI, LOADING"
-        sendmessage(Message);
-    }
-    else {
-        Message.msg = "Action required"
-        sendmessage(Message);
-    }
-    res.header('Content-Type', 'text/html').send("<html>Reload OK </html>");
-});
+
+    console.timeEnd("getbestposts")
 
 
-const server = app.listen(port, function () { console.log('App listening on ' + port); });
-const io = socket(server);
-io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
-
-app.get('/', function (req, res) {
-    res.status(200).send('HELLO WORLD')
 })
 
 
-io.on('connection', function (socket) {
-
-    io.to(socket.id).emit("private", {
-        sockid: "Server",
-        room: "dms999",
-        msg: "Welcome to this page",
-        now: new Date()
-    })
-    socket.on('join', function (msg) {
-        socket.join(msg);
-        let pack = {
-            sockid: socket.id,
-            room: msg,
-            msg: "joined " + msg,
-            now: new Date()
-        }
-        io.to(socket.id).emit("private", pack)
-        pack.msg = socket.id + " joined"
-        io.to(msg).emit(pack)
-
-        // socket.to(socket.id).emit('private', )
-    })
-    socket.on("toroom", (msg) => {
-        if (msg.room && msg.msg) {
-            const pack = {
-                sockid: socket.id,
-                room: msg.room,
-                msg: msg.msg,
-                now: new Date()
-            }
-            io.to(msg.room).emit("private", pack)
-        }
-    })
-    socket.on('chat', function (msg) {
-        const Message = {
-            sockid: socket.id,
-            room: "Global",
-            msg: msg,
-            now: new Date()
-        }
-        io.emit('chat1', Message)
-    });
-
-    socket.on('disconnect', sock => {
-        console.log("disconnection")
-        console.log(sock)
-        console.log(socket.id)
-        console.log("===D_S_C===")
-    });
-    socket.on("connect", sock => {
-        console.log("connection")
-        console.log(sock)
-        console.log(socket.id)
-        console.log("===C_N_C===")
-    })
-
-});
 
 
-function sendmessage(Message) {
-    console.log('Message >> ', Message);
-    io.emit('chat1', Message)
-    // io.of('/node').to(channel).emit(channel, {msg: Message,user:'Admin'})
-}
+
+
+
