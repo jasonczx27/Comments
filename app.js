@@ -1,7 +1,8 @@
 const app = require('express')();
 // var http = require('http').Server(express);
 const port = process.env.PORT || 8000;
-
+const path = require('path');
+require("dotenv").config({ path: path.join(__dirname + '/.env') })
 const reqVM = require("./model/general/viewmodel")
 
 const cors = require('cors');

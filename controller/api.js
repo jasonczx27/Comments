@@ -2,6 +2,9 @@ const https = require("https")
 const { resolve } = require("path")
 const reqVM = require("../model/general/viewmodel")
 const q = require("../model/queries")
+const path = require('path');
+require("dotenv").config({ path: path.join(__dirname + '../blocked.env') })
+
 
 //#region Alts
 // GET / posts
