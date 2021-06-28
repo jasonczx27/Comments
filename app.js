@@ -32,15 +32,14 @@ app.get("/posts", async function (req, res) {
     var requestVM = new reqVM()
     console.time("     getbestposts")
     try {
-
         const ipaddr = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         console.log(`captured request from ${ipaddr} using ${req.get("User-Agent")}`)
 
-        if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
+        // if (!req.get("host").includes("localost:" + port) && !req.get("Postman-Token")) {
 
-            requestVM.requestDisauthorized("un-autorized access detected")
-            res.status(requestVM.statuscode).json(requestVM)
-        }
+        //     requestVM.requestDisauthorized("un-autorized access detected")
+        //     res.status(requestVM.statuscode).json(requestVM)
+        // }
         const request = await api.BestPosts(postid);
         if (request && request.issuccess) {
             requestVM.requestSuccess(request.data);
